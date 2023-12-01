@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans  xmlns="http://www.springframework.org/schema/beans"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:context="http://www.springframework.org/schema/context"
+        xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context.xsd">
+    <context:property-placeholder location="classpath:musicPlayer.properties"/>
+    <bean id="musicBean1" class="ru.bochkarev.spring.ClassicalMusic"></bean>
+    <bean id="musicBean2" class="ru.bochkarev.spring.PhonkMusic"></bean>
+    <bean id="musicBean3" class="ru.bochkarev.spring.RockMusic"></bean>
+
+
+    <bean id = "musicPlayer" class="ru.bochkarev.spring.MusicPlayer">
+        <property name="name" value="${musicPlayer.name}"/>
+        <property name="volume" value="${musicPlayer.volume}"/>
+        <property name="musicList">
+            <list>
+                <ref bean="musicBean1"/>
+                <ref bean="musicBean2"/>
+                <ref bean="musicBean3"/>
+            </list>
+        </property>
+
+
+    </bean>
+
+
+
+</beans>
+package ru.bochkarev.spring;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class MusicPlayer {
+    private List<Music> musicList = new ArrayList<>();
+    private String name;
+    private int volume;
+
+    public int getVolume() {
+        return volume;
+    }
+
+    public void setVolume(int volume) {
+        this.volume = volume;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public List<Music> getMusicList() {
+        return musicList;
+    }
+
+    public void setMusicList(List<Music> musicList) {
+        this.musicList = musicList;
+    }
+}
+package ru.bochkarev.spring;
+
+public interface Music {
+    String getSong();
+}
+package ru.bochkarev.spring;
+
+public class ClassicalMusic implements Music{
+    @Override
+    public String getSong() {
+        return  "classic";
+    }
+}
+package ru.bochkarev.spring;
+
+public class PhonkMusic implements Music{
+    @Override
+    public String getSong() {
+        return "play phonk";
+    }
+}
+package ru.bochkarev.spring;
+
+public class RockMusic implements Music {
+
+    @Override
+    public String getSong() {
+        return "rock";
+    }
+}
+package ru.bochkarev.spring;
+
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+public class TestSpring {
+    public static void main(String[] args) {
+        ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext(
+                "applicationContext.xml"
+        );
+
+        MusicPlayer musicPlayer = context.getBean("musicPlayer", MusicPlayer.class);
+        for (Music music : musicPlayer.getMusicList()) {
+            System.out.println(music.getSong());
+        }
+
+        context.close();
+    }
+}
